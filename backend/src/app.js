@@ -2,6 +2,9 @@ import express , {urlencoded} from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 
+// Importing Routes
+import userRouter from "./routes/userRegisterationRoute.js"
+
 
 
 // Normal Express app
@@ -23,6 +26,8 @@ app.use(express.json({
 
 
 // Routes
+app.use('/api/v1/admin', userRouter)
+
 
 
 
