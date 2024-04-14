@@ -4,7 +4,7 @@ import {ApiError} from "../utils/ApiError.js"
 import { User } from "../models/user.model.js";
 
 
-// This route is for admins only to register new Merchant
+// This route is for admins only to register new Merchant and new Admins
 
 const registerUser = asyncHandler(async (req, res) => {
  
@@ -75,10 +75,19 @@ const login = asyncHandler(async(req,res)=>{
 
 })
 
+const logout = asyncHandler(async(req,res)=>{
+
+    return res
+    .status(200)
+    .clearCookie("accessToken")
+    .json(new ApiResponse(200,"User logged out successfully")) 
+
+})
+
 
 
 export {
     registerUser,
-    login
-
+    login,
+    logout
 }
