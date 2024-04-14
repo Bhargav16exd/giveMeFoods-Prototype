@@ -5,6 +5,7 @@ import cors from 'cors';
 // Importing Routes
 import userRouter from "./routes/userRegisterationRoute.js"
 import foodRouter from "./routes/foodRouter.js"
+import paymentRouter from "./routes/paymentRoute.js"
 
 
 
@@ -29,6 +30,7 @@ app.use(express.json({
 // Routes
 app.use('/api/v1/admin', userRouter)
 app.use('/api/v1/admin/menu',foodRouter )
+app.use('/api/v1/payment',paymentRouter)
 
 
 
