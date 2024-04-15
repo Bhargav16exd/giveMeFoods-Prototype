@@ -1,11 +1,12 @@
 import { ApiError } from "../utils/ApiError.js";
 import { Food } from "../models/food.model.js";
-import { ApiResponse } from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import axios from "axios";
 import mongoose from "mongoose";
 import { Order } from "../models/orders.model.js";
 import sha256 from "sha256";
+import io from "../app.js";
+
 
 
 const MERCHANT_ID = "PGTESTPAYUAT";
@@ -39,17 +40,7 @@ const payToPhonePay = asyncHandler(async (req, res) => {
   }
 
   const merchantTransactionIdByUs = Math.floor(Math.random() * 100000000000);
-
-  const order = await Order.create({
-    name,
-    quantity: 1,
-    price,
-    phoneNo,
-    orderIdByMerchant: merchantTransactionIdByUs,
-    foodId,
-    OTP: Math.floor(Math.random() * 10000),
-  });
-
+  
 
   // Creating a payload to send to phonepe
 
@@ -87,6 +78,18 @@ const payToPhonePay = asyncHandler(async (req, res) => {
         request: base64EncodedPayLoad
     },
   };
+
+
+   await Order.create({
+    name,
+    quantity: 1,
+    price,
+    phoneNo,
+    foodId,
+    transactionId:"MT7850590068188104",
+    OTP: Math.floor(Math.random() * 10000),
+  });
+
            
   await axios
     .request(options)
@@ -112,6 +115,11 @@ const checkPayment = asyncHandler(async(req,res)=>{
         throw new ApiError(400,"No order found")
     }
 
+    const orders = await Order.findOne({transactionId:merchantTransactionId})
+
+    if(!orders){
+      throw new ApiError(500,"Internal Server Error")
+    }
 
 
     const xVerify = sha256(`/pg/v1/status/${MERCHANT_ID}/${merchantTransactionId}`+ SALT_KEY )+ "###"+ SALT_INDEX
@@ -128,12 +136,23 @@ const checkPayment = asyncHandler(async(req,res)=>{
              }
       };
 
-      
 
       axios
         .request(options)
-        .then(function (response) {
+        .then(async function (response) {
             console.log(response.data);
+            if(response.data?.code == 'PAYMENT_SUCCESS' ){
+              orders.transactionStatus = "SUCCESS"
+              await orders.save()
+              console.log("Order status updated successfully");
+              await Emitter()
+              return res.redirect("http://localhost:5173/payment/success")
+            }
+            else if(response.data?.code == 'PAYMENT_ERROR'){
+              orders.transactionStatus = "FAILED"
+              await orders.save()
+              return res.redirect("http://localhost:5173/payment/failed")
+            }
         })
         .catch(function (error) {
           console.error(error);
@@ -143,7 +162,17 @@ const checkPayment = asyncHandler(async(req,res)=>{
 
 })
 
+async function Emitter(){
+  console.log("Emitter called")
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const orders = await Order.find({
+      orderStatus: "Pending",
+      createdAt: { $gte: today },
+  }).select("name phoneNo foodId orderStatus");
 
+  io.emit("allOrders", orders);
+}
 
 
 export { payToPhonePay , checkPayment };

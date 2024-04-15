@@ -19,10 +19,6 @@ const orderSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    orderIdByMerchant:{
-        type: String,
-        required: true
-    },
     foodId:{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Food",

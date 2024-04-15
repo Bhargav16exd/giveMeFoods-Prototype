@@ -1,23 +1,18 @@
 import dotenv from 'dotenv';
-import app from './app.js';
+import{ server} from './app.js';
 import connectToDatabase from './database/db.js';
 
 const PORT = process.env.PORT ;
-
-
 
 // dotEnv Setup
 dotenv.config(
     {path:'./env'}
 );
-
-
 // database connection
 
 connectToDatabase()
 .then(()=>{
-
-    app.listen(PORT , ()=>{
+    server.listen(PORT , ()=>{
       console.log(`Server started at port ${PORT}`)
     })
 
