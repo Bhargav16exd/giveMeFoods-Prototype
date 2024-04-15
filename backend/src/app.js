@@ -46,7 +46,7 @@ io.use((socket,next)=>{
 
 // Routes
 app.use('/api/v1/admin', userRouter)
-app.use('/api/v1/admin/menu',foodRouter )
+app.use('/api/v1/menu',foodRouter )
 app.use('/api/v1/payment',paymentRouter)
 
 

@@ -142,9 +142,9 @@ const checkPayment = asyncHandler(async(req,res)=>{
         .then(async function (response) {
             console.log(response.data);
             if(response.data?.code == 'PAYMENT_SUCCESS' ){
+              console.log(orders)
               orders.transactionStatus = "SUCCESS"
               await orders.save()
-              console.log("Order status updated successfully");
               await Emitter()
               return res.redirect("http://localhost:5173/payment/success")
             }
@@ -169,6 +169,7 @@ async function Emitter(){
   const orders = await Order.find({
       orderStatus: "Pending",
       createdAt: { $gte: today },
+      transactionStatus:"SUCCESS"
   }).select("name phoneNo foodId orderStatus");
 
   io.emit("allOrders", orders);

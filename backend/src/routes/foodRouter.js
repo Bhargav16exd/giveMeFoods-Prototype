@@ -18,7 +18,7 @@ router.route('/updateItem').put(updateFoodMenu)
 
 
 // User Routes
-router.route('/menu').get(getFoodMenu)
+router.route('/listMenu').get(getFoodMenu)
 
 
 export default router;
