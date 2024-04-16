@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import { listFoodItems } from '../redux/slices/foodSlices';
+import FoodCard from './FoodCard';
 
 function MenuPage(){
 
@@ -14,8 +15,26 @@ function MenuPage(){
     },[])
 
     return(
-        <div>
-            <h1>Menu Page</h1>
+        <div className='min-h-screen w-screen bg-[#1e1e1e]'>
+
+            {/* Nav Div  */}
+             <div className='text-white font-bold text-4xl py-4 flex justify-center items-center h-[10vh]'>
+                Menu
+             </div>
+
+            {/* Menu Div */}
+
+            <div className='min-h-[90vh] flex flex-wrap justify-evenly items-center '>
+                 {loading ? <div>Loading...</div> : menu.map((food: any) => {
+                        return <FoodCard key={food._id} name={food.name} picture={food.picture} price={food.price} id={food._id} />
+                    })}
+           
+              
+            </div>
+
+            
+            
+            
         </div>
     )
 }
