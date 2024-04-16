@@ -15,7 +15,22 @@ export const listFoodItems = createAsyncThunk(
     'food/listFoodItems',
     async function() {
         try {
-            const response = await axios.get('http://localhost:8090/api/v1/menu/listMenu');
+            const response = await axios.get('http://localhost:8010/api/v1/menu/listMenu');
+            return response.data;
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
+    }
+);
+
+export const buyFoodItem:any = createAsyncThunk(
+    'food/buyFoodItem',
+    async function(data: any) {
+
+        console.log(data);
+        try {
+            const response = await axios.post('http://localhost:8010/api/v1/payment/pay', data);
             return response.data;
         } catch (error) {
             console.log(error);

@@ -4,7 +4,6 @@ import FailedPage from './components/FailedPage'
 import SuccessPage from './components/SuccessPage'
 import MerchantDashboard from './components/MerchantDashboard'
 import MenuPage from './components/MenuPage'
-import BuyPage from './components/BuyPage'
 
 function App() {
  
@@ -19,7 +18,7 @@ function App() {
 
         <Route path='/merchantDashboard' element={<MerchantDashboard/>}></Route>
 
-        <Route path='/buy/:id' element={<BuyPage/>}></Route>
+        
 
 
 
