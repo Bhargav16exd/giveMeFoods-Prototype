@@ -4,26 +4,27 @@ import axios from "axios"
 interface authState {
     loggedInStatus:any,
     token:string,
-    data:any
+    data:any,
+    errors:any
 }
 
 
 const initialState: authState = {
     loggedInStatus: localStorage.getItem("loggedInStatus") || false ,
     token: localStorage.getItem("token") || '',
-    data:  localStorage.getItem("data")  || {}
+    data:  localStorage.getItem("data")  || {},
+    errors: ''
 };
 
 
 export const handleLoginFunction:any = createAsyncThunk(
     'auth/login',
-    async function(data:any){
+    async function(data:any , {rejectWithValue}:any){
         try {
             const response = await axios.post('http://localhost:8010/api/v1/admin/login',data)
             return response.data
         } catch (error) {
-            console.log(error)
-            throw error;
+            return rejectWithValue(error.response.data)
         }
     }
 )
@@ -41,7 +42,10 @@ const authSlice = createSlice({
             localStorage.setItem("loggedInStatus",JSON.stringify(true))
             state.data = action.payload?.data
             state.loggedInStatus = true
-            state.token = action.payload?.data?.token
+            state.token = action.payload?.data?.token 
+        })
+        .addCase(handleLoginFunction.rejected , (state,action)=>{
+            state.errors = action.payload.message
         })
     }
 })

@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
 import { handleLoginFunction } from "../redux/slices/authSlices"
 
@@ -9,7 +9,7 @@ function LoginPage(){
         userId:'',
         password:''
     })
-     
+    const error =  useSelector((state:any)=> state.authenticationDetails?.errors)
     const navigate = useNavigate()
     const dispatch = useDispatch()
 
@@ -22,22 +22,28 @@ function LoginPage(){
     }
 
     async function handleSubmit(e:any){
-                  
-        e.preventDefault()
-        const res = await dispatch(handleLoginFunction(loginData))
-        console.log(res.payload)
-        if(res.payload.statusCode == 200 && res.payload.success == true){
-            navigate('/merchantDashboard')
-        }
         
+        e.preventDefault()
+             
+            try {
+                const res = await dispatch(handleLoginFunction(loginData))
+                if(res.payload?.statusCode == 200 && res.payload?.success == true){
+        
+                    navigate('/merchantDashboard')
+                }
+            
+            } catch (error) {
+                console.log(error)
+            }
     }
 
     return(
+
         <div className="w-screen h-screen bg-[#1e1e1e] flex justify-center items-center ">
 
                  {/* Main login Div  */}
                  <div className="h-96 w-80 rounded-3xl shadow-black shadow-lg flex justify-center items-center flex-col">
-
+              
                  <div className="h-16 w-72 flex justify-center items-center">
                             <input type="text" name="userId" value={loginData.userId} onChange={handleChange} placeholder="Name" className="h-10 w-64 rounded-3xl bg-[#1e1e1e] text-white px-4"/>
                         </div>
@@ -50,6 +56,12 @@ function LoginPage(){
                             <button type="submit" className="h-10 w-64 rounded-3xl bg-green-600 text-white font-bold text-lg" onClick={handleSubmit}>Login</button>
                         </div>
 
+                        { error &&
+                        <div className="h-16 w-72 flex justify-center items-center">
+                            <p className="text-red-500">{error}</p>
+                        </div>   
+                        }
+                    
                  </div>
         </div>
     )
