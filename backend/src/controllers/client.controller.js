@@ -13,7 +13,7 @@ const MERCHANT_ID = "PGTESTPAYUAT";
 const PHONE_PE_HOST_URL = "https://api-preprod.phonepe.com/apis/pg-sandbox";
 const SALT_INDEX = 1;
 const SALT_KEY = "099eb0cd-02cf-4e2a-8aca-3e6c6aff0399";
-const APP_BE_URL = "http://localhost:8090";
+const APP_BE_URL = "http://localhost:8010";
 
 // Pay to PhonePay API
 
@@ -94,9 +94,9 @@ const payToPhonePay = asyncHandler(async (req, res) => {
   await axios
     .request(options)
     .then(function (response) {
-      console.log(response.data);
       session.commitTransaction()
-      res.send(response.data.data.instrumentResponse.redirectInfo)
+      const url = response.data.data.instrumentResponse.redirectInfo.url
+      return res.send(url);
     })
     .catch(function (error) {
       session.abortTransaction()
@@ -140,9 +140,8 @@ const checkPayment = asyncHandler(async(req,res)=>{
       axios
         .request(options)
         .then(async function (response) {
-            console.log(response.data);
+
             if(response.data?.code == 'PAYMENT_SUCCESS' ){
-              console.log(orders)
               orders.transactionStatus = "SUCCESS"
               await orders.save()
               await Emitter()
@@ -163,15 +162,15 @@ const checkPayment = asyncHandler(async(req,res)=>{
 })
 
 async function Emitter(){
-  console.log("Emitter called")
+  
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const orders = await Order.find({
       orderStatus: "Pending",
-      createdAt: { $gte: today },
-      transactionStatus:"SUCCESS"
+      createdAt: { $gte: today }
+      // add here payment = success when in prod
   }).select("name phoneNo foodId orderStatus");
-
+  console.log("Emitter called" , orders)
   io.emit("allOrders", orders);
 }
 

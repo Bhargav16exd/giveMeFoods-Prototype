@@ -28,6 +28,7 @@ function MerchantDashboard() {
         }); 
 
         socket.on('allOrders', (orderData) => {
+            console.log("sokcet called" , orderData)
             setOrders(orderData);
         });
 

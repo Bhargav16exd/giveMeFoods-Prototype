@@ -10,6 +10,15 @@ export const socketListener = () =>{
 
     io.on("connection" , async (socket)=>{
 
+        // after page refresh this will get the user the order details
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const orders = await Order.find({
+            orderStatus: "Pending",
+            createdAt: { $gte: today }
+            
+        }).select("name phoneNo foodId orderStatus");
+        io.emit("allOrders", orders);
     
         try {
             console.log(`Socket connected: ${socket.id}`);
