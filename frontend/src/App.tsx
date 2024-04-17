@@ -4,6 +4,7 @@ import FailedPage from './components/FailedPage'
 import SuccessPage from './components/SuccessPage'
 import MerchantDashboard from './components/MerchantDashboard'
 import MenuPage from './components/MenuPage'
+import LoginPage from './components/LoginPage'
 
 function App() {
  
@@ -18,7 +19,7 @@ function App() {
 
         <Route path='/merchantDashboard' element={<MerchantDashboard/>}></Route>
 
-        
+        <Route path='/merchant/login' element={<LoginPage/>}></Route>
 
 
 

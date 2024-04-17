@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import io from 'socket.io-client';
 
 
@@ -12,14 +13,17 @@ function MerchantDashboard() {
     }
 
     const [orders, setOrders] = useState<order[]>([]);
+    const token = useSelector((state:any)=> state.authenticationDetails?.token)
+
 
     console.log(orders)
+  
 
     useEffect(() => {
 
-        const socket = io('http://localhost:8090' , {
+        const socket = io('http://localhost:8010' , {
         auth:{
-        token:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2MWE4ZjcyOWVhNzQxNjgzZTNmNjdkNyIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxMzE1NjYwNSwiZXhwIjoxNzEzNzYxNDA1fQ.ULrxS0CSuzrD7UY7lgHUcUKxPUtH9LQHRL6WjbWhB2w'
+        token:token
         }
         }); 
 

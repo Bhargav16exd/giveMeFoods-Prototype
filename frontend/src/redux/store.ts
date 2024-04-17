@@ -1,11 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import foodSlices from "./slices/foodSlices";
+import authSlices from "./slices/authSlices";
 
 
 
 const store = configureStore({
     reducer: {
-        listFood:foodSlices
+        listFood:foodSlices,
+        authenticationDetails:authSlices
     },
 
 });

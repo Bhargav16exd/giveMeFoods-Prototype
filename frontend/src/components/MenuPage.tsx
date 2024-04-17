@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import { listFoodItems } from '../redux/slices/foodSlices';
 import FoodCard from './FoodCard';
+import { Link } from 'react-router-dom';
 
 function MenuPage(){
 
@@ -18,8 +19,17 @@ function MenuPage(){
         <div className='min-h-screen w-screen bg-[#1e1e1e]'>
 
             {/* Nav Div  */}
-             <div className='text-white font-bold text-4xl py-4 flex justify-center items-center h-[10vh]'>
-                Menu
+             <div className='text-white font-bold text-4xl py-4 flex justify-center items-center h-[10vh] '>
+                        
+                        
+                        <div className='relative right-[-10%]'>Menu</div>
+
+                        <Link to={'/merchant/login'}>
+                        <div className="w-72 flex justify-center items-center relative right-[-150%]">
+                            <button type="submit" className="h-10 w-40 rounded-3xl bg-green-600 text-white font-bold text-lg " >Login</button>
+                        </div>
+                        </Link>
+
              </div>
 
             {/* Menu Div */}

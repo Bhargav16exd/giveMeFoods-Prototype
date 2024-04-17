@@ -4,8 +4,6 @@ import Popup from "reactjs-popup";
 import { buyFoodItem } from "../redux/slices/foodSlices";
 
 
-
-
 function FoodCard(props:any) {
 
     const dispatch = useDispatch();
