@@ -3,11 +3,13 @@ import axios from "axios";
 
 interface FoodState {
     food: any[];
+    category: any[];
     loading: boolean;
 }
 
 const initialState: FoodState = {
     food: [],
+    category: [],
     loading: false,
 }
 
@@ -49,8 +51,11 @@ const foodSlice = createSlice({
                 state.loading = true;
             })
             .addCase(listFoodItems.fulfilled, (state, action: PayloadAction<any>) => {
+                console.log(action.payload?.data.category);
                 state.loading = false;
-                state.food = action.payload?.data;
+                state.food = action.payload?.data?.food;
+                state.category = action.payload?.data?.category;
+                console.log(state.food)
             });
     }
 });

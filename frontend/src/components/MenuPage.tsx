@@ -8,9 +8,10 @@ import searchh from '../assets/search.png'
 function MenuPage(){
 
     const dispatch = useDispatch()
-    const menu = useSelector((state: any) => state?.listFood?.food)  
+    const menu = useSelector((state: any) => state?.listFood?.food) 
+    const category = useSelector((state: any) => state?.listFood?.category)  
     const loading = useSelector((state: any) => state?.listFood?.loading)  
-    console.log(menu,loading)
+    console.log(category)
 
     useEffect(()=>{
       dispatch(listFoodItems() as any)
@@ -71,10 +72,19 @@ function MenuPage(){
 
             {/* Menu Div */}
 
-            <div className='min-h-[90vh] flex flex-wrap justify-evenly items-center '>
-                 {loading ? <div>Loading...</div> : menu.map((food: any) => {
-                        return <FoodCard key={food._id} name={food.name} picture={food.picture} price={food.price} id={food._id} />
-                    })}
+            <div className='h-auto w-screen my-2 px-2 flex justify-center items-center flex-col'>
+                 {loading ? <div>Loading...</div> : category.map((category: any) =>{
+                
+                 return(
+                 <div className=' h-[50%] w-full my-2' key={category}>
+                    
+                    <div className='h-8 px-4 flex justify-start items-center font-medium'>{category}</div>
+
+                    {menu.map((food:any) => (food.category === category ? <FoodCard key={food._id} food={food} /> : null))}
+                
+                 </div>
+                 
+                )})}
            
               
             </div>
