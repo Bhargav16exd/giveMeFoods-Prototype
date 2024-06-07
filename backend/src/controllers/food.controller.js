@@ -9,16 +9,18 @@ const addFoodToMenu = asyncHandler(async(req,res)=>{
 
     // Picture Uploading is pending need to fix it 
 
-    const {name , picture, price} = req.body
+    const {name , picture, price,category,time} = req.body
 
-    if(!name || !price){
+    if(!name || !price || !category || !time){
         throw new ApiError(400,"Please provide all the required fields")
     }
 
     const food = await Food.create({
         name,
         picture,
-        price
+        price,
+        category,
+        time
     }) 
 
     await food.save()
@@ -84,12 +86,42 @@ const updateFoodMenu = asyncHandler(async(req,res)=>{
 const getFoodMenu = asyncHandler(async(req,res)=>{
 
     const food = await Food.find({})
+    const category = await Food.distinct('category')
+
+    const menu = {
+        food: food,
+        category:category
+    }
 
     return res
     .status(200)
-    .json(new ApiResponse(200, "Food Menu", food))
+    .json(new ApiResponse(200, "Food Menu", menu))
+
+})
+
+// listing food items based on id recieved 
+
+const listFoodItems = asyncHandler(async(req,res)=>{
+
+    const idArray = req.body 
+
+
+    if(!idArray){
+        throw new ApiError(400,"Please provide all the required fields")
+    }
+
+
+    const foodList = await Promise.all(idArray.map(async (id) => {
+        return await Food.findById(id.foodId);
+    }));
+
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, "Food Items", foodList))
 
 })
 
 
-export {addFoodToMenu, deleteFoodFromMenu, updateFoodMenu, getFoodMenu} 
+
+export {addFoodToMenu, deleteFoodFromMenu, updateFoodMenu, getFoodMenu,listFoodItems} 

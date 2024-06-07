@@ -1,16 +1,22 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
+
 interface FoodState {
     food: any[];
     category: any[];
     loading: boolean;
+    orderStatus:any;
+    foodById:any[]
 }
 
 const initialState: FoodState = {
     food: [],
     category: [],
     loading: false,
+    orderStatus : {},
+    foodById:[]
+
 }
 
 export const listFoodItems = createAsyncThunk(
@@ -25,6 +31,36 @@ export const listFoodItems = createAsyncThunk(
         }
     }
 );
+
+export const getFoodItemOnIDs = createAsyncThunk(
+    'foo/getFoodOnId',
+    async function(ids:any) {
+       console.log("IDS recived in slice",ids)
+        try {
+            const response = await axios.post('http://localhost:8010/api/v1/menu/foodList',ids);
+            return response.data;
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
+    }
+)
+
+export const checkOrderStatus:any = createAsyncThunk(
+    'food/checkStatus',
+    async function (id){
+        console.log(id)
+        try {
+            const response = await axios.get(`http://localhost:8010/api/v1/menu/checkStatus/${id}`);
+            return response.data;
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
+    }
+)
+
+
 
 export const buyFoodItem:any = createAsyncThunk(
     'food/buyFoodItem',
@@ -56,7 +92,14 @@ const foodSlice = createSlice({
                 state.food = action.payload?.data?.food;
                 state.category = action.payload?.data?.category;
                 console.log(state.food)
-            });
+            })
+            .addCase(checkOrderStatus.fulfilled,(state,action: PayloadAction<any>)=>{
+                state.orderStatus = action.payload?.data
+                console.log(state.orderStatus)
+            })
+            .addCase(getFoodItemOnIDs.fulfilled,(state,action:PayloadAction<any>)=>{
+                state.foodById = action.payload?.data
+            })
     }
 });
 

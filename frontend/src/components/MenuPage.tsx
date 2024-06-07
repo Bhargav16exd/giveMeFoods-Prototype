@@ -3,6 +3,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import { listFoodItems } from '../redux/slices/foodSlices';
 import FoodCard from './FoodCard';
 import searchh from '../assets/search.png' 
+import { Link } from 'react-router-dom';
 
 
 function MenuPage(){
@@ -11,7 +12,9 @@ function MenuPage(){
     const menu = useSelector((state: any) => state?.listFood?.food) 
     const category = useSelector((state: any) => state?.listFood?.category)  
     const loading = useSelector((state: any) => state?.listFood?.loading)  
-    console.log(category)
+    const cartcount = useSelector((state:any)=> state?.cartData?.itemsCount)
+
+
 
     useEffect(()=>{
       dispatch(listFoodItems() as any)
@@ -31,7 +34,10 @@ function MenuPage(){
                             <button type="submit" className="h-10 w-40 rounded-3xl bg-green-600 text-white font-bold text-lg " >Login</button>
                         </div>
                         </Link> */}
-                        
+                         
+                         <Link to={'/cart'}>
+                        <button className='relative left-20 bg-red-400 py-1 px-4 rounded-lg'>Cart {cartcount? cartcount : <></>}</button>
+                        </Link>
 
              </div>
             

@@ -13,8 +13,16 @@ const foodSchema = new mongoose.Schema({
     picture:{
         type: String,
         required: true
+    },
+    category:{
+        type: String,
+        required: true
+    },
+    time:{
+        type: String,
+        required: true
     }
-
+    
 }, {timestamps: true})
 
 

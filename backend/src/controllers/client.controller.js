@@ -6,13 +6,15 @@ import mongoose from "mongoose";
 import { Order } from "../models/orders.model.js";
 import sha256 from "sha256";
 import io from "../app.js";
+import { messeger } from "../utils/messeger.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
 
 
 
-const MERCHANT_ID = "PGTESTPAYUAT";
+const MERCHANT_ID = "PGTESTPAYUAT143";
 const PHONE_PE_HOST_URL = "https://api-preprod.phonepe.com/apis/pg-sandbox";
 const SALT_INDEX = 1;
-const SALT_KEY = "099eb0cd-02cf-4e2a-8aca-3e6c6aff0399";
+const SALT_KEY = "ab3ab177-b468-4791-8071-275c404d8ab0";
 const APP_BE_URL = "http://localhost:8010";
 
 // Pay to PhonePay API
@@ -23,32 +25,51 @@ const APP_BE_URL = "http://localhost:8010";
 // After payment is done, phonepay will send a callback to the server
 
 const payToPhonePay = asyncHandler(async (req, res) => {
+
   // Starting a transaction
   const session = await mongoose.startSession();
   session.startTransaction();
 
-  const { name, price, phoneNo, foodId } = req.body;
+  const { name, phoneNo, items } = req.body;
 
-  if (!name || !price || !phoneNo || !foodId) {
+  if (!name || !phoneNo || !items) {
     throw new ApiError(400, "Please provide all the details");
   }
 
-  const food = await Food.findById(foodId);
+  let totalPrice = 0 
+  const orderItems = []
 
-  if (!food) {
-    throw new ApiError(404, "Food not found");
-  }
+ 
+  // This loops go to each item sent by frontend and check whether the IDs exist IF not error and then create a array of Order ITEMS
+  for (const item of items) {
+    const food = await Food.findById(item.foodId);
+
+      if (!food) {
+      throw new ApiError(400,"IDs doest not exist in DB");
+      }
+
+      totalPrice = totalPrice + food.price * item.quantity
+
+      orderItems.push({
+        foodId:item.foodId,
+        quantity:item.quantity,
+        OTP: Math.floor(Math.random() * 10000),
+        orderStatus:"PENDING"
+      })
+    
+    }
 
   const merchantTransactionIdByUs = Math.floor(Math.random() * 100000000000);
   
+  console.log(totalPrice)
 
   // Creating a payload to send to phonepe
 
   const payload = {
-    merchantId: "PGTESTPAYUAT",
+    merchantId: "PGTESTPAYUAT143",
     merchantTransactionId: "MT7850590068188104",
     merchantUserId: "MUID123",
-    amount: price * 100,
+    amount: totalPrice * 100,
     redirectUrl:`${APP_BE_URL}/api/v1/payment/statusAPI/MT7850590068188104`,
     redirectMode: "REDIRECT",
     mobileNumber: "9999999999",
@@ -78,16 +99,15 @@ const payToPhonePay = asyncHandler(async (req, res) => {
         request: base64EncodedPayLoad
     },
   };
-
+  
+  
 
    await Order.create({
-    name,
-    quantity: 1,
-    price,
-    phoneNo,
-    foodId,
+    customerName: name,
+    phoneNo: phoneNo,
     transactionId:"MT7850590068188104",
-    OTP: Math.floor(Math.random() * 10000),
+    price: totalPrice,
+    items: orderItems
   });
 
            
@@ -145,6 +165,7 @@ const checkPayment = asyncHandler(async(req,res)=>{
               orders.transactionStatus = "SUCCESS"
               await orders.save()
               await Emitter()
+              await messeger(orders)
               return res.redirect("http://localhost:5173/payment/success")
             }
             else if(response.data?.code == 'PAYMENT_ERROR'){
@@ -165,14 +186,60 @@ async function Emitter(){
   
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+
+  // All Orders
   const orders = await Order.find({
-      orderStatus: "Pending",
+      orderStatus:  { $in: ["Pending", "Accepted"] },
       createdAt: { $gte: today }
       // add here payment = success when in prod
-  }).select("name phoneNo foodId orderStatus");
-  console.log("Emitter called" , orders)
-  io.emit("allOrders", orders);
+  }).select("orderName customerName createdAt quantity orderStatus")
+
+
+  const ordersWithAMPM = orders.map(order => {
+    const createdAtAMPM = order.createdAt.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
+    return { 
+        ...order._doc,
+        createdAt: createdAtAMPM 
+    };
+  });
+
+  // Distinct Order Names
+  
+  const distinctOrders = await Order.distinct("orderName" , {
+    orderStatus:  { $in: ["Pending", "Accepted"] },
+    createdAt: { $gte: today }
+  })
+
+  const orderData = {
+    ordersWithAMPM,
+    distinctOrders
+  }
+
+  io.emit("allOrders", orderData);
 }
 
 
-export { payToPhonePay , checkPayment };
+const checkOrderStatus = asyncHandler(async(req,res)=>{
+
+  const id = req.params?.id 
+
+  console.log(id)
+
+  if(!id){
+    throw new ApiError(400,"Invalid Id")
+  }
+
+  const order = await Order.findById(id)
+
+  if(!order){
+    throw new ApiError(400,"No Such Orders Exist")
+  }
+
+  return res
+  .status(200)
+  .json( new ApiResponse (200, "Order Status Fetched Success", order))
+
+})
+
+
+export { payToPhonePay , checkPayment, checkOrderStatus};

@@ -5,8 +5,12 @@ import SuccessPage from './components/SuccessPage'
 import MerchantDashboard from './components/MerchantDashboard'
 import MenuPage from './components/MenuPage'
 import LoginPage from './components/LoginPage'
+import OrderStatusPage from './components/OrderStatusPage'
+import CartPage from './components/CartPage'
 
 function App() {
+
+
  
   return (
     <>
@@ -20,6 +24,10 @@ function App() {
         <Route path='/merchantDashboard' element={<MerchantDashboard/>}></Route>
 
         <Route path='/merchant/login' element={<LoginPage/>}></Route>
+
+        <Route path='/order/status/:id' element={<OrderStatusPage/>}></Route>
+
+        <Route path='/cart' element={<CartPage/>}> </Route>
 
 
 

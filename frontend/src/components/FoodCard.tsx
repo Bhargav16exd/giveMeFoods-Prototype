@@ -1,42 +1,17 @@
-import { useState } from "react";
+
 import { useDispatch } from "react-redux";
-import Popup from "reactjs-popup";
-import { buyFoodItem } from "../redux/slices/foodSlices";
 import clock from "../assets/time.png"
+import { addItemToCart } from "../redux/slices/CartSlice";
 
 
 function FoodCard(props:any) {
 
-    const dispatch = useDispatch();
+    const dispatch = useDispatch() 
 
-    const [buyData, setBuyData] = useState({
-        name: '',
-        price:props.food.price,
-        phoneNo: '',
-        foodId: props.food._id
-    })
-
-    const handleChange = (e:any) => {
-      
-        const {name, value} = e.target; 
-        setBuyData({
-            ...buyData,
-            [name]: value
-        })
-
-    }
-
-    const handleSubmit = async (e:any) => {
-        e.preventDefault();
-        const url = await dispatch(buyFoodItem(buyData))
-        if (url.payload) {
-            console.log("Redirecting to:", url.payload);
-            window.location.href = url.payload;
-          
-        } else {
-            console.error("URL not received from the backend");
-        }
-    }
+   function handleClick(){
+        dispatch(addItemToCart(props.food))
+   }
+   
 
 
     return(
@@ -48,30 +23,9 @@ function FoodCard(props:any) {
                 <div className="font-medium">{props.food.name}</div>
                 <div className="font-medium"> ₹ {props.food.price}</div>
 
-                  <Popup trigger={<button className="h-7 text-white w-20  rounded-xl bg-[#FF8181]  px-2 my-2">Order</button>}
-                   modal>
-                          {/* BUY details DIV */}
-                   <div className="h-96 w-80 rounded-3xl flex justify-center items-center flex-col bg-[#ffffff]">
+                <button className="h-7 text-white w-auto  rounded-xl bg-[#FF8181]  px-2 my-2" onClick={handleClick}>Add to cart</button>
 
-                       <div className="h-16 w-72 flex justify-center items-center">
-                            <div className=" font-bold text-lg">Place Order</div>
-                       </div>
-
-
-                        <div className="h-16 w-72 flex justify-center items-center">
-                            <input type="text" name="name" value={buyData.name} onChange={handleChange} placeholder="Name" className="h-10 w-64 rounded-xl border border-[#CDCDCD] outline-none bg-[#F6F6F6] px-4"/>
-                         </div>
-
-                         <div className="h-16 w-72 flex justify-center items-center">
-                            <input type="number" name="phoneNo" value={buyData.phoneNo} onChange={handleChange} placeholder="Phone No" className="h-10 w-64 rounded-xl border border-[#CDCDCD] outline-none bg-[#F6F6F6]  px-4"/>
-                         </div>
-
-                       <div className="h-16 w-72 flex justify-center items-center">
-                             <button type="submit" className="h-10 text-white w-36  rounded-2xl bg-[#FF8181]  px-2 my-2" onClick={handleSubmit}>Place Order</button>
-                        </div>
-
-                     </div>
-                </Popup> 
+                
 
 
             </div>

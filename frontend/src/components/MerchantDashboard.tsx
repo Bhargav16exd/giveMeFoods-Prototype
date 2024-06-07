@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import io from 'socket.io-client';
+import io from 'socket.io-client'
+
 
 
 function MerchantDashboard() {
@@ -10,19 +11,17 @@ function MerchantDashboard() {
         customerName:string,
         createdAt:string
         quantity:number
-        foodId:string,
+        _id:string,
         orderStatus:string
     }
+    
     
     const [orders, setOrders] = useState<order[]>([]);
     const [distinctOrders, setDistinctOrders] = useState<any[]>([]);
     const token = useSelector((state:any)=> state.authenticationDetails?.token)
-
-
     console.log(orders)
-    console.log(distinctOrders)
-  
 
+    
     useEffect(() => {
 
         const socket = io('http://localhost:8010' , {
@@ -36,6 +35,7 @@ function MerchantDashboard() {
             setOrders(orderData.ordersWithAMPM);
             setDistinctOrders(orderData.distinctOrders);
         });
+ 
 
         return () => {
             socket.disconnect();
@@ -102,8 +102,15 @@ function MerchantDashboard() {
                                                     }
                                                 </div>
                                                 <div className=' w-[20%] py-3 '>
+
+                                                    {orderData.orderStatus == 'Pending' ? 
+                                                      
+                                                        <button className='bg-black text-white px-3 py-1 rounded-3xl' >Accept</button> :
+                                                        <button className='bg-green-500 text-white px-3 py-1 rounded-3xl'>Deliver</button>
+                                                    
+                                                    }
                                         
-                                                 </div>
+                                                </div>
                                             </div>
                                         )
                                     }

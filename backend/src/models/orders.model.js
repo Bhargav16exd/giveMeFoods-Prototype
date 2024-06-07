@@ -3,25 +3,13 @@ import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema({
 
-    name:{
+
+    customerName:{
         type: String,
-        required: true
-    },
-    quantity:{
-        type: Number,
-        required: true
-    },
-    price:{
-        type: Number,
         required: true
     },
     phoneNo:{
         type: Number,
-        required: true
-    },
-    foodId:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Food",
         required: true
     },
     transactionId:{
@@ -30,16 +18,34 @@ const orderSchema = new mongoose.Schema({
     },
     transactionStatus:{
         type: String,
-        default:"Not Started"
+        default:"NOT STARTED",
+        enum:['NOT STARTED', 'SUCCESS', 'FAILED']
     },
-    OTP:{
+    price:{
         type: Number,
         required: true
     },
-    orderStatus:{
-        type: String,
-        default: "Pending"
-    },
+    items:[{
+        foodId:{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Food",
+            required: true
+        },
+        quantity:{
+            type: Number,
+            required: true
+        },
+        OTP:{
+            type: Number,
+            required: true
+        },
+        orderStatus:{
+            type: String,
+            default: "PENDING",
+            enum:['PENDING', 'ACCEPTED', 'DELIVERED']
+        }
+
+    }]
 
 },
 {timestamps: true})

@@ -13,15 +13,41 @@ export const socketListener = () =>{
         // after page refresh this will get the user the order details
         const today = new Date();
         today.setHours(0, 0, 0, 0);
+      
+        // All Orders
         const orders = await Order.find({
-            orderStatus: "Pending",
+            orderStatus:  { $in: ["Pending", "Accepted"] },
             createdAt: { $gte: today }
-            
-        }).select("name phoneNo foodId orderStatus");
-        io.emit("allOrders", orders);
+            // add here payment = success when in prod
+        }).select("orderName customerName createdAt quantity orderStatus")
+      
+      
+        const ordersWithAMPM = orders.map(order => {
+          const createdAtAMPM = order.createdAt.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
+          return { 
+              ...order._doc,
+              createdAt: createdAtAMPM 
+          };
+        });
+      
+        // Distinct Order Names
+        
+        const distinctOrders = await Order.distinct("orderName" , {
+          orderStatus: { $in: ["Pending", "Accepted"] },
+          createdAt: { $gte: today }
+        })
+      
+        const orderData = {
+          ordersWithAMPM,
+          distinctOrders
+        }
+
+
+        io.emit("allOrders", orderData);
     
         try {
             console.log(`Socket connected: ${socket.id}`);
+
 
             socket.on("disconnect", () => {
               console.log(`Socket disconnected: ${socket.id}`);
@@ -35,6 +61,31 @@ export const socketListener = () =>{
 
 
 }
+
+
+const acceptOrder = asyncHandler(async(req,res)=>{
+       
+    const {orderId} = req.body
+
+    if(!orderId){
+        throw new ApiError(400, "Please provide Order ID")
+    }
+
+    const order = await Order.findById(orderId)
+
+    if(!order){
+        throw new ApiError(404, "Order not found")
+    }
+
+    order.orderStatus = "Accepted"
+
+    await order.save()
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, "Order accepted successfully"))
+
+})
 
 const confirmOrder = asyncHandler(async(req,res)=>{
    
@@ -66,4 +117,6 @@ const confirmOrder = asyncHandler(async(req,res)=>{
 })
 
 
-export {confirmOrder}
+
+
+export {confirmOrder,acceptOrder}
