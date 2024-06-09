@@ -12,14 +12,14 @@ function MerchantDashboard() {
         createdAt:string
         quantity:number
         _id:string,
-        orderStatus:string
+        orderStatus:string,
+        items:any
     }
     
     
     const [orders, setOrders] = useState<order[]>([]);
     const [distinctOrders, setDistinctOrders] = useState<any[]>([]);
     const token = useSelector((state:any)=> state.authenticationDetails?.token)
-    console.log(orders)
 
     
     useEffect(() => {
@@ -52,11 +52,11 @@ function MerchantDashboard() {
 
             <div className='h-auto  py-10'>
             {
-               distinctOrders && distinctOrders.map((order,index) => {
+               distinctOrders && distinctOrders.map((order) => {
                     return (
-                        <div key={index} className='h-auto my-6 mx-4 bg-[#F2F2F2] rounded-xl'>
+                        <div key={order._id} className='h-auto my-6 mx-4 bg-[#F2F2F2] rounded-xl'>
                         
-                           <div className='px-5 py-4 text-lg font-semibold'>{order}</div>
+                           <div className='px-5 py-4 text-lg font-semibold'>{order.name}</div>
 
                            <div className='flex  text-base'>
                                        <div className=' w-[20%] px-5 my-2'>
@@ -79,9 +79,15 @@ function MerchantDashboard() {
 
                             {
                                 orders && orders.map((orderData,index) => {
-                                    if(orderData.orderName === order){
-                                        return (
-                                            <div key={index} className='border-t h-auto  text-xl  flex'>
+
+                                    console.log(orderData)
+
+                                    return(
+                                        orderData.items.map((item:any)=>{
+
+                                            if(item.foodId === order._id){
+                                                return(
+                                                    <div key={index} className='border-t h-auto  text-xl  flex'>
 
                                                 <div className=' w-[20%] px-5 py-3'>
                                                    {orderData.customerName}
@@ -90,20 +96,20 @@ function MerchantDashboard() {
                                                    {orderData.createdAt }
                                                 </div>
                                                 <div className=' w-[20%] py-3 flex justify-center items-center'>
-                                                    {orderData.quantity}
+                                                    {item.quantity}
                                                 </div>
                                                 <div className=' w-[20%] py-3 flex justify-center items-center'>
-                                                    {orderData.orderStatus == 'Pending' ?
+                                                    {item.orderStatus == 'PENDING' ?
                                                       
-                                                      <span className='text-red-500'>{orderData.orderStatus}</span> :
+                                                      <span className='text-red-500'>{item.orderStatus}</span> :
 
-                                                        <span className='text-yellow-500'>{orderData.orderStatus}</span>
+                                                        <span className='text-yellow-500'>{item.orderStatus}</span>
                                                     
                                                     }
                                                 </div>
                                                 <div className=' w-[20%] py-3 '>
 
-                                                    {orderData.orderStatus == 'Pending' ? 
+                                                    {item.orderStatus == 'PENDING' ? 
                                                       
                                                         <button className='bg-black text-white px-3 py-1 rounded-3xl' >Accept</button> :
                                                         <button className='bg-green-500 text-white px-3 py-1 rounded-3xl'>Deliver</button>
@@ -112,8 +118,13 @@ function MerchantDashboard() {
                                         
                                                 </div>
                                             </div>
-                                        )
-                                    }
+                                               )
+                                            }
+                                            
+                                        }) 
+                                    )
+
+
                                 })
                             }
                             
