@@ -165,7 +165,7 @@ const checkPayment = asyncHandler(async(req,res)=>{
               orders.transactionStatus = "SUCCESS"
               await orders.save()
               await Emitter()
-              await messeger(orders)
+             // await messeger(orders)
               return res.redirect("http://localhost:5173/payment/success")
             }
             else if(response.data?.code == 'PAYMENT_ERROR'){
@@ -189,11 +189,11 @@ async function Emitter(){
 
   // All Orders
   const orders = await Order.find({
-      orderStatus:  { $in: ["Pending", "Accepted"] },
+      items: { $elemMatch: { orderStatus: { $in: ["PENDING", "ACCEPTED"] } } },
       createdAt: { $gte: today }
       // add here payment = success when in prod
-  }).select("orderName customerName createdAt quantity orderStatus")
-
+  })
+  
 
   const ordersWithAMPM = orders.map(order => {
     const createdAtAMPM = order.createdAt.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
@@ -205,15 +205,26 @@ async function Emitter(){
 
   // Distinct Order Names
   
-  const distinctOrders = await Order.distinct("orderName" , {
-    orderStatus:  { $in: ["Pending", "Accepted"] },
-    createdAt: { $gte: today }
-  })
+  let distinctOrdersId = []
 
+  orders.forEach(order => {
+    order.items.forEach(item => {
+      const foodIdStr = item.foodId.toString();
+      if (!distinctOrdersId.includes(foodIdStr)) {
+        distinctOrdersId.push(foodIdStr);
+      }
+    });
+  });
+ 
+  const distinctFoods = await Food.find({ _id: { $in: distinctOrdersId } }).select("name");
+
+  console.log(distinctFoods)
+   
   const orderData = {
-    ordersWithAMPM,
-    distinctOrders
-  }
+     ordersWithAMPM,
+    distinctOrders: distinctFoods
+  };
+  
 
   io.emit("allOrders", orderData);
 }
