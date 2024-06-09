@@ -8,6 +8,7 @@ import LoginPage from './components/LoginPage'
 import OrderStatusPage from './components/OrderStatusPage'
 import CartPage from './components/CartPage'
 
+
 function App() {
 
 
@@ -29,9 +30,8 @@ function App() {
 
         <Route path='/cart' element={<CartPage/>}> </Route>
 
-
-
-
+        
+        
       </Routes>
        
     </>

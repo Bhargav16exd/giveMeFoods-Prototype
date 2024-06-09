@@ -6,12 +6,13 @@ import Popup from "reactjs-popup";
 import { buyFoodItem } from "../redux/slices/foodSlices";
 
 
+
 function CartPage(){
 
 
     const dispatch = useDispatch()
     const cart = useSelector((state:any)=>state.cartData.cart)
-    
+    const [confirmUI , setConfirmUI] = useState(true)
     const [cartEmpty , setCartEmptyState] = useState(false)
 
     console.log("Cart",cart)
@@ -32,10 +33,32 @@ function CartPage(){
 
     }
 
-    const handleSubmit = async (e:any) => {
+    const handleSubmit = () => {
+
+        if(buyData.name === '' || buyData.phoneNo === '' ){
+            alert("Please fill the form")
+            return
+        }
+        else if(buyData.phoneNo.length !== 10){
+            alert("Phone number should be of 10 digits")
+            return
+        }
+        else if(buyData.name.includes("<script>") || buyData.phoneNo.includes("<script>")){
+            alert("Invalid input")
+            return
+        }
+
+        setConfirmUI(false)
+    }
+
+    const handleSubmit1 = () => {
+        setConfirmUI(true)
+    }
+
+    const handleSubmitt = async (e:any) => {
+
         e.preventDefault();
         
-
         const url = await dispatch(buyFoodItem(buyData))
         if (url.payload) {
             console.log("Redirecting to:", url.payload);
@@ -96,24 +119,46 @@ function CartPage(){
 
                    modal>
                           {/* BUY details DIV */}
-                   <div className="h-96 w-80 rounded-3xl flex justify-center items-center flex-col bg-[#ffffff]">
+                   <div className="h-96 w-80 rounded-3xl flex justify-center items-center flex-col bg-red-100">
 
                        <div className="h-16 w-72 flex justify-center items-center">
                             <div className=" font-bold text-lg">Place Order</div>
                        </div>
 
+                       {
+                          confirmUI ? <>
 
-                        <div className="h-16 w-72 flex justify-center items-center">
-                            <input type="text" name="name" value={buyData.name} onChange={handleChange} placeholder="Name" className="h-10 w-64 rounded-xl border border-[#CDCDCD] outline-none bg-[#F6F6F6] px-4"/>
-                         </div>
+                            <div className="h-16 w-72 flex justify-center items-center">
+                                <input type="text" name="name" value={buyData.name} onChange={handleChange} placeholder="Name" className="h-10 w-64 rounded-xl border border-[#CDCDCD] outline-none bg-[#F6F6F6] px-4"/>
+                            </div>
 
-                         <div className="h-16 w-72 flex justify-center items-center">
-                            <input type="number" name="phoneNo" value={buyData.phoneNo} onChange={handleChange} placeholder="Phone No" className="h-10 w-64 rounded-xl border border-[#CDCDCD] outline-none bg-[#F6F6F6]  px-4"/>
-                         </div>
+                            <div className="h-16 w-72 flex justify-center items-center">
+                                <input type="number" name="phoneNo" value={buyData.phoneNo} onChange={handleChange} placeholder="Phone No" className="h-10 w-64 rounded-xl border border-[#CDCDCD] outline-none bg-[#F6F6F6]  px-4"/>
+                            </div>
 
-                       <div className="h-16 w-72 flex justify-center items-center">
-                             <button type="submit" className="h-10 text-white w-36  rounded-2xl bg-[#FF8181]  px-2 my-2" onClick={handleSubmit}>Place Order</button>
-                        </div>
+                            <div className="h-16 w-72 flex justify-center items-center">   
+                                <button type="submit" className="h-10 text-white w-36  rounded-2xl bg-[#FF8181]  px-2 my-2" onClick={handleSubmit}>Confirm</button>
+                            </div> 
+                            
+                            </> :
+                            <>
+
+                            <div className="h-16 w-72 flex justify-center items-center">
+                                <h1>Name : {buyData.name}</h1>
+                            </div>
+
+                            <div className="h-16 w-72 flex justify-center items-center">
+                                <h1>Phone No : {buyData.phoneNo}</h1>
+                            </div>
+
+                            <div className="h-16 w-72 flex justify-center items-center">   
+                                <button type="submit" className="h-10 text-white w-32 mx-4  rounded-2xl bg-[#FF8181]  px-2 my-2" onClick={handleSubmit1}>Edit</button>
+                                <button type="submit" className="h-10 text-white w-32 mx-4  rounded-2xl bg-[#FF8181]  px-2 my-2" onClick={handleSubmitt}>Place Order</button>
+                            </div>
+                            
+                            </>
+                       }
+                        
 
                      </div>
                 </Popup> 
