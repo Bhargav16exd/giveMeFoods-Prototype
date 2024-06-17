@@ -1,5 +1,7 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+import backendAPI from "../../constant";
+
 
 
 interface FoodState {
@@ -23,7 +25,7 @@ export const listFoodItems = createAsyncThunk(
     'food/listFoodItems',
     async function() {
         try {
-            const response = await axios.get('http://localhost:8010/api/v1/menu/listMenu');
+            const response = await axios.get(`${backendAPI}/api/v1/menu/listMenu`);
             return response.data;
         } catch (error) {
             console.log(error);
@@ -37,7 +39,7 @@ export const getFoodItemOnIDs = createAsyncThunk(
     async function(ids:any) {
        console.log("IDS recived in slice",ids)
         try {
-            const response = await axios.post('http://localhost:8010/api/v1/menu/foodList',ids);
+            const response = await axios.post(`${backendAPI}/api/v1/menu/foodList`,ids);
             return response.data;
         } catch (error) {
             console.log(error);
@@ -51,7 +53,7 @@ export const checkOrderStatus:any = createAsyncThunk(
     async function (id){
         console.log(id)
         try {
-            const response = await axios.get(`http://localhost:8010/api/v1/menu/checkStatus/${id}`);
+            const response = await axios.get(`${backendAPI}/api/v1/menu/checkStatus/${id}`);
             return response.data;
         } catch (error) {
             console.log(error);
@@ -68,7 +70,7 @@ export const buyFoodItem:any = createAsyncThunk(
 
         console.log(data);
         try {
-            const response = await axios.post('http://localhost:8010/api/v1/payment/pay', data);
+            const response = await axios.post(`${backendAPI}/api/v1/payment/pay`, data);
             return response.data;
         } catch (error) {
             console.log(error);

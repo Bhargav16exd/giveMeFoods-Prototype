@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import axios from "axios"
+import backendAPI from "../../constant";
 
 interface authState {
     loggedInStatus:any,
@@ -21,7 +22,7 @@ export const handleLoginFunction:any = createAsyncThunk(
     'auth/login',
     async function(data:any , {rejectWithValue}:any){
         try {
-            const response = await axios.post('http://localhost:8010/api/v1/admin/login',data)
+            const response = await axios.post(`${backendAPI}/api/v1/admin/login`,data)
             return response.data
         } catch (error) {
             return rejectWithValue(error.response.data)

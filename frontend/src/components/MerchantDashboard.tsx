@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import Popup from 'reactjs-popup';
 import io from 'socket.io-client'
 
 
@@ -41,6 +42,10 @@ function MerchantDashboard() {
             socket.disconnect();
         };
     }, []);
+
+    // function handleConfirmOrder(orderId:string){
+    //     console.log("Order Confirmed",orderId)
+    // }
 
 
     return (
@@ -109,12 +114,13 @@ function MerchantDashboard() {
                                                 </div>
                                                 <div className=' w-[20%] py-3 '>
 
-                                                    {item.orderStatus == 'PENDING' ? 
-                                                      
-                                                        <button className='bg-black text-white px-3 py-1 rounded-3xl' >Accept</button> :
-                                                        <button className='bg-green-500 text-white px-3 py-1 rounded-3xl'>Deliver</button>
-                                                    
-                                                    }
+                                                     <Popup trigger={<button className='bg-red-500 text-white px-3 py-1 rounded-3xl'>Deliver</button>} modal >
+                                                            {/* BUY details DIV */}
+                                                            <div className="h-96 w-80 rounded-3xl flex justify-center items-center flex-col bg-red-100">
+
+
+                                                            </div>
+                                                      </Popup> 
                                         
                                                 </div>
                                             </div>

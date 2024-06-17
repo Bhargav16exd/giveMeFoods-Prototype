@@ -14,6 +14,7 @@ function CartPage(){
     const cart = useSelector((state:any)=>state.cartData.cart)
     const [confirmUI , setConfirmUI] = useState(true)
     const [cartEmpty , setCartEmptyState] = useState(false)
+    const [cartTotal , setCartTotal] = useState(0)
 
     console.log("Cart",cart)
 
@@ -34,6 +35,12 @@ function CartPage(){
     }
 
     const handleSubmit = () => {
+          
+        // Cart total validator 
+        if(cartTotal < 50){
+            alert("Minimum order amount should be 150")
+            return
+        }
 
         if(buyData.name === '' || buyData.phoneNo === '' ){
             alert("Please fill the form")
@@ -41,10 +48,6 @@ function CartPage(){
         }
         else if(buyData.phoneNo.length !== 10){
             alert("Phone number should be of 10 digits")
-            return
-        }
-        else if(buyData.name.includes("<script>") || buyData.phoneNo.includes("<script>")){
-            alert("Invalid input")
             return
         }
 
@@ -79,6 +82,9 @@ function CartPage(){
             ...prevBuyData,
             items: items
         }));
+
+        const total = cart.reduce((total:any,cartItem:any)=>total + cartItem.price * cartItem.quantity,0)
+        setCartTotal(total)
     }, [cart]);
 
     
@@ -114,7 +120,7 @@ function CartPage(){
                 <Popup 
                 trigger={<div className="flex border  bg-red-400 py-1 px-4 rounded-lg  text-white justify-center items-center cursor-pointer" >
                     <h1 className="text-2xl font-bold my-4 mx-4  text-center">Order Now</h1>
-                    <h1 className="text-2xl font-bold my-4  text-center">Total: {cart.reduce((total:any,cartItem:any)=>total + cartItem.price * cartItem.quantity,0)}</h1>
+                    <h1 className="text-2xl font-bold my-4  text-center">Total: {cartTotal}</h1>
                 </div>}
 
                    modal>
