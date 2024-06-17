@@ -1,13 +1,16 @@
+import { set } from "mongoose";
 import  io  from "../app.js";
 import { Food } from "../models/food.model.js";
 import { Order } from "../models/orders.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
+import Emitter from "./client.controller.js";
 
 
 
 export const socketListener = () =>{
+
 
     io.on("connection" , async (socket)=>{
 
@@ -17,7 +20,7 @@ export const socketListener = () =>{
       
         // All Orders
         const orders = await Order.find({
-            items: { $elemMatch: { orderStatus: { $in: ["PENDING", "ACCEPTED"] } } },
+            items: { $elemMatch: { orderStatus: { $in: ["PENDING"] } } },
             createdAt: { $gte: today }
             // add here payment = success when in prod
         })
@@ -46,7 +49,6 @@ export const socketListener = () =>{
        
         const distinctFoods = await Food.find({ _id: { $in: distinctOrdersId } }).select("name");
       
-        console.log(distinctFoods)
          
         const orderData = {
            ordersWithAMPM,
@@ -57,7 +59,6 @@ export const socketListener = () =>{
     
         try {
             console.log(`Socket connected: ${socket.id}`);
-
 
             socket.on("disconnect", () => {
               console.log(`Socket disconnected: ${socket.id}`);
@@ -73,51 +74,33 @@ export const socketListener = () =>{
 }
 
 
-const acceptOrder = asyncHandler(async(req,res)=>{
-       
-    const {orderId} = req.body
-
-    if(!orderId){
-        throw new ApiError(400, "Please provide Order ID")
-    }
-
-    const order = await Order.findById(orderId)
-
-    if(!order){
-        throw new ApiError(404, "Order not found")
-    }
-
-    order.orderStatus = "Accepted"
-
-    await order.save()
-
-    return res
-    .status(200)
-    .json(new ApiResponse(200, "Order accepted successfully"))
-
-})
-
 const confirmOrder = asyncHandler(async(req,res)=>{
    
-     const {otp , orderId} = req.body
+     const {otp , orderId, foodId} = req.body
 
-     if(!otp || !orderId){
-         throw new ApiError(400, "Please provide OTP and Order ID")
+     if(!otp || !orderId || !foodId){
+         throw new ApiError(400, "Please provide OTP and Order ID and Food ID")
      }
 
-     const order = await Order.findById(orderId)
+    const order = await Order.findOneAndUpdate(
+        { 
+          _id: orderId,
+          "items.foodId": foodId
+        },
+        { 
+          $set: { "items.$.orderStatus": "DELIVERED" }
+        },
+        { 
+          new: true
+        }
+      );
 
      if(!order){
          throw new ApiError(404, "Order not found")
      }
-    
-     if(order.OTP !== otp){
-         throw new ApiError(400, "Invalid OTP")
-     }
-
-    order.orderStatus = "Completed"
 
     await order.save()
+    await Emitter()
 
     return res
     .status(200)
@@ -129,4 +112,4 @@ const confirmOrder = asyncHandler(async(req,res)=>{
 
 
 
-export {confirmOrder,acceptOrder}
+export {confirmOrder}

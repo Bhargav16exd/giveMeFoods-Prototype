@@ -8,6 +8,7 @@ import {Server} from 'socket.io'
 import userRouter from "./routes/userRegisterationRoute.js"
 import foodRouter from "./routes/foodRouter.js"
 import paymentRouter from "./routes/paymentRoute.js"
+import merchantRouter from "./routes/merchantRoute.js"
 import { authenticateSocket } from './middlewares/authMiddleware.js';
 import { socketListener } from './controllers/merchant.controller.js';
 
@@ -48,6 +49,7 @@ io.use((socket,next)=>{
 app.use('/api/v1/admin', userRouter)
 app.use('/api/v1/menu',foodRouter )
 app.use('/api/v1/payment',paymentRouter)
+app.use('/api/v1/merchant',merchantRouter)
 
 
 // Error Handling 

@@ -59,6 +59,13 @@ const payToPhonePay = asyncHandler(async (req, res) => {
     
     }
 
+
+   // price cap handling
+   
+    if(totalPrice < 50){
+      throw new ApiError(400,"Minimum Order Value is 50")
+    }
+
   const merchantTransactionIdByUs = Math.floor(Math.random() * 100000000000);
   
   console.log(totalPrice)
@@ -254,3 +261,4 @@ const checkOrderStatus = asyncHandler(async(req,res)=>{
 
 
 export { payToPhonePay , checkPayment, checkOrderStatus};
+export default Emitter

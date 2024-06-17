@@ -5,8 +5,8 @@ async function messeger(orderData){
 
     console.log(orderData.OTP)
 
-    const url = 'https://graph.facebook.com/v19.0/346687115194469/messages'
-    const token = 'EAALjBQVZAPskBO5v3yJSMtQDkgX0dZAto4JvY7MQt2vEum1xY4SY1g0GZCFR8e6uQayDHBdZAr7AgynGvtI4ZChRikqUy4YDeuZAxZApGH7DfS9sfR89vn8ZBtVDbX2omZBKDb0LhezBWhMhqbdy3of0JBduJxH6RJVaXkw880tglOZBI8Tcyw1ohar9IZBTfD1d0BaiRpuwIMOyh5ssrIftensFeAy6StJzkU4jm0ZD'
+    const url = process.env.whatsappAPI
+    const token = process.env.whatsappToken
     const recipientPhoneNumber = orderData.phoneNo
     const messageContent = 
     `Hello ${orderData.customerName} , Thank You for confirming the order of Rs ${orderData.price} . OTP is ${orderData.OTP} 
