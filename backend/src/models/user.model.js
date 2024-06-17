@@ -52,7 +52,7 @@ userSchema.methods.getSignedToken = function(){
     },
      process.env.JWT_SECRET,
     {
-        expiresIn: process.env.JWT_EXPIRE
+        expiresIn:'7d'
 
     })
 

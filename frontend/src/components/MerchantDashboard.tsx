@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import Popup from 'reactjs-popup';
 import io from 'socket.io-client'
 
@@ -21,7 +22,7 @@ function MerchantDashboard() {
     const [orders, setOrders] = useState<order[]>([]);
     const [distinctOrders, setDistinctOrders] = useState<any[]>([]);
     const token = useSelector((state:any)=> state.authenticationDetails?.token)
-
+    const navigate = useNavigate()
     
     useEffect(() => {
 
@@ -36,7 +37,13 @@ function MerchantDashboard() {
             setOrders(orderData.ordersWithAMPM);
             setDistinctOrders(orderData.distinctOrders);
         });
- 
+
+        socket.on('connect_error', (error) => {
+            if (error.message === "Unauthorized") {
+                navigate('/merchant/login')
+            }
+        });
+    
 
         return () => {
             socket.disconnect();
