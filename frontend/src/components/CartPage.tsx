@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import CartCard from "./CartCard";
 import Popup from "reactjs-popup";
 import { buyFoodItem } from "../redux/slices/foodSlices";
+import { toast } from "sonner";
 
 
 
@@ -63,12 +64,13 @@ function CartPage(){
         e.preventDefault();
         
         const url = await dispatch(buyFoodItem(buyData))
+
         if (url.payload) {
             console.log("Redirecting to:", url.payload);
             window.location.href = url.payload;
           
         } else {
-            console.error("URL not received from the backend");
+            toast.error("Unexpected crash occured kindly contact the team")
         }
     }
 

@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { toast } from "sonner";
 
 const initialState = {
     cart: JSON.parse(localStorage.getItem('cart') || '[]'),
@@ -10,7 +11,7 @@ const cartSlice = createSlice({
     initialState,
     reducers:{
         addItemToCart: (state,action)=>{
-            
+
             const item = action.payload;
 
             console.log("Item",item)
@@ -28,6 +29,10 @@ const cartSlice = createSlice({
             state.itemsCount = state.cart.reduce((total:any,cartItem:any)=>total + cartItem.quantity,0)
             localStorage.setItem('itemsCount',JSON.stringify(state.itemsCount))
             localStorage.setItem('cart',JSON.stringify(state.cart))
+
+            toast(`${item.name} added to cart`)
+            
+           
         },
         removeItem: (state,action)=>{
           
@@ -37,6 +42,8 @@ const cartSlice = createSlice({
             state.itemsCount = state.cart.reduce((total:any,cartItem:any)=>total + cartItem.quantity,0)
             localStorage.setItem('itemsCount',JSON.stringify(state.itemsCount))
             localStorage.setItem('cart',JSON.stringify(state.cart))
+
+            toast(`${item.name} removed from cart`)
 
         },
         incrementQuantity: (state,action)=>{
@@ -51,6 +58,7 @@ const cartSlice = createSlice({
             state.itemsCount = state.cart.reduce((total:any,cartItem:any)=>total + cartItem.quantity,0)
             localStorage.setItem('itemsCount',JSON.stringify(state.itemsCount))
             localStorage.setItem('cart',JSON.stringify(state.cart))
+
         
         },
         decrementQuantity: (state,action)=>{

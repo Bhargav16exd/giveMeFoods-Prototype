@@ -1,6 +1,7 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import backendAPI from "../../constant";
+import { toast } from "sonner";
 
 
 
@@ -25,10 +26,15 @@ export const listFoodItems = createAsyncThunk(
     'food/listFoodItems',
     async function() {
         try {
-            const response = await axios.get(`${backendAPI}/api/v1/menu/listMenu`);
-            return response.data;
+            const response = axios.get(`${backendAPI}/api/v1/menu/listMenu`);
+
+            toast.promise(response,{
+                loading: 'Loading...'
+            })
+            
+            return  (await response).data;
         } catch (error) {
-            console.log(error);
+            toast.error(error.message);
             throw error;
         }
     }
@@ -42,7 +48,7 @@ export const getFoodItemOnIDs = createAsyncThunk(
             const response = await axios.post(`${backendAPI}/api/v1/menu/foodList`,ids);
             return response.data;
         } catch (error) {
-            console.log(error);
+            toast.error(error.message);
             throw error;
         }
     }
@@ -56,24 +62,24 @@ export const checkOrderStatus:any = createAsyncThunk(
             const response = await axios.get(`${backendAPI}/api/v1/menu/checkStatus/${id}`);
             return response.data;
         } catch (error) {
-            console.log(error);
+            toast.error(error.message);
             throw error;
         }
     }
 )
 
 
-
 export const buyFoodItem:any = createAsyncThunk(
     'food/buyFoodItem',
     async function(data: any) {
-
-        console.log(data);
         try {
-            const response = await axios.post(`${backendAPI}/api/v1/payment/pay`, data);
-            return response.data;
+            const response = axios.post(`${backendAPI}/api/v1/payment/pay`, data);
+            toast.promise(response,{
+                loading: 'redirecting...'
+            })
+            return (await response).data;
         } catch (error) {
-            console.log(error);
+            toast.error(error.message);
             throw error;
         }
     }
